@@ -1,0 +1,20 @@
+<main class="app-shell">
+  <h1>{{ title }}</h1>
+  
+  <gridster [options]="options">
+    @for (item of dashboard; track item) {
+      <gridster-item [item]="item">
+        <div class="widget-header">{{ item.title }}</div>
+        <div class="widget-content">
+          
+          @if (item.title === 'Revenue Chart Overview') {
+            <app-sales-chart></app-sales-chart>
+          } @else {
+            <div class="placeholder-text">Standard Dashboard Widget Content</div>
+          }
+          
+        </div>
+      </gridster-item>
+    }
+  </gridster>
+</main>
