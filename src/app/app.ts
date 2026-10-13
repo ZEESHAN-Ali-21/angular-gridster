@@ -1,37 +1,76 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { Gridster, GridsterConfig, GridsterItem, type GridsterItemConfig } from 'angular-gridster2';
-import { SalesChartComponent } from './sales-chart.component';
 
-interface DashboardItem extends GridsterItemConfig {
-  title: string;
-}
+import { CommonModule } from '@angular/common';
+import { Component, HostListener } from '@angular/core';
+import {
+  NavigationEnd,
+  Router,
+  RouterLink,
+  RouterLinkActive,
+  RouterOutlet
+} from '@angular/router';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [Gridster, GridsterItem, SalesChartComponent],
+  imports: [
+    CommonModule,
+    RouterOutlet,
+    RouterLink,
+    RouterLinkActive
+  ],
   templateUrl: './app.html',
-  styleUrls: ['./app.css'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  styleUrl: './app.css'
 })
 export class App {
-  title = 'angular-gridster-demo';
+  activeNav = 'dashboard';
+  showProfileMenu = false;
 
-  public options: GridsterConfig = {
-    gridType: 'fit',
-    compactType: 'none',
-    draggable: { enabled: true },
-    resizable: { enabled: true },
-    minCols: 6,
-    maxCols: 6,
-    minRows: 6,
-    maxRows: 6,
-    displayGrid: 'always'
-  };
-
-  public dashboard: DashboardItem[] = [
-    { cols: 2, rows: 2, y: 0, x: 0, title: 'Revenue Chart Overview' },
-    { cols: 2, rows: 2, y: 0, x: 2, title: 'Widget 1' },
-    { cols: 2, rows: 2, y: 2, x: 0, title: 'Widget 2' }
+  navItems = [
+    { id: 'dashboard', label: 'Dashboard', icon: '▦', path: '/dashboard' },
+    { id: 'analytics', label: 'Analytics', icon: '▥', path: '/analytics' },
+    { id: 'reports', label: 'Reports', icon: '▤', path: '/reports' },
+    { id: 'users', label: 'Users', icon: '♙', path: '/users' },
+    { id: 'settings', label: 'Settings', icon: '⚙', path: '/settings' },
+    { id: 'help', label: 'Help Center', icon: '?', path: '/help' }
   ];
+
+  constructor(private router: Router) {
+    this.router.events.subscribe(event => {
+      if (event instanceof NavigationEnd) {
+        const path = this.router.url.split('?')[0].split('/')[1];
+        this.activeNav = path || 'dashboard';
+        this.showProfileMenu = false;
+      }
+    });
+  }
+
+  getPageTitle(): string {
+    return this.navItems.find(item => item.id === this.activeNav)?.label
+      ?? 'Dashboard';
+  }
+
+  toggleProfileMenu(event: MouseEvent): void {
+    event.stopPropagation();
+    this.showProfileMenu = !this.showProfileMenu;
+  }
+
+  @HostListener('document:click')
+  closeProfileMenu(): void {
+    this.showProfileMenu = false;
+  }
+
+  viewDetails(): void {
+    this.showProfileMenu = false;
+    alert('View Details clicked');
+  }
+
+  logout(): void {
+    this.showProfileMenu = false;
+
+    const confirmed = confirm('Are you sure you want to log out?');
+
+    if (confirmed) {
+      alert('Logout logic is not connected yet.');
+    }
+  }
 }
